@@ -1,10 +1,14 @@
 #define sensorPin A1
+#define valvePin 1
 int analogOutputRange[2] = {0, 1023};
 int sensorReading;
 
 void setup() {
   pinMode(sensorPin, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT); //Use an LED to Check ValveLogic
+  pinMode(sensorPin, OUTPUT);
   Serial.begin(9600);
+  
 }
 
 void loop() {
@@ -20,6 +24,7 @@ void calculatePascal(float reading){
   //if(actualPascalOutput <=0){
   //  actualPascalOutput = 0;  
   //}
+  checkExecuteValve(actualPascalOutput, covertedPsiOutput);
   printPressure(actualPascalOutput, covertedPsiOutput);
 }
 
@@ -33,4 +38,18 @@ void printPressure(float pascal, float psi){
   Serial.print("MPa ");
   Serial.print(psi);
   Serial.print("Psi");
-  Serial.println("");}
+  Serial.println("");
+}
+
+void checkExecuteValve(float pascal, float psi){
+  if (pascal <= 0.0233){
+    digitalWrite(sensorPin, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+    Serial.println("Turned On Valve");
+  }
+  if (pascal >= 0.0333){
+    digitalWrite(sensorPin, LOW);
+    digitalWrite(LED_BUILTIN, LOW);
+    Serial.println("Turned Off Valve");
+  }
+}
