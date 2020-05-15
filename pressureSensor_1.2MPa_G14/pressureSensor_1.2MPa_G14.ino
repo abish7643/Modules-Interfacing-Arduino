@@ -1,14 +1,19 @@
+#include <LiquidCrystal.h>
 #define sensorPin A1
 #define valvePin 1
 int analogOutputRange[2] = {0, 1023};
 int sensorReading;
+const int rs = 12, en = 11; // 16*2 LCD Display | RS - 42, Enable - 44, Data - 5, 4, 3, 2 (R/W - GND)
+LiquidCrystal lcd(rs, en, 5, 4, 3, 2);
 
 void setup() {
   pinMode(sensorPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT); //Use an LED to Check ValveLogic
-  pinMode(sensorPin, OUTPUT);
-  Serial.begin(9600);
-  
+  pinMode(valvePin, OUTPUT);
+  //Serial.begin(9600);
+  lcd.begin(16, 2);
+  lcd.clear();
+
 }
 
 void loop() {
@@ -34,22 +39,36 @@ float pascalToPsiCoversion(float pascal){
 
 
 void printPressure(float pascal, float psi){
-  Serial.print(pascal);
-  Serial.print("MPa ");
-  Serial.print(psi);
-  Serial.print("Psi");
-  Serial.println("");
+  //Serial.print(pascal);
+  //Serial.print("MPa ");
+  //Serial.print(psi);
+  //Serial.print("Psi");
+  //Serial.println("");
+  lcd.setCursor(0, 0);
+  lcd.print(pascal);
+  lcd.print(" MPa");
+  lcd.setCursor(1, 0);
+  lcd.print(psi);
+  lcd.print(" Psi");
 }
 
 void checkExecuteValve(float pascal, float psi){
   if (pascal <= 0.0233){
-    digitalWrite(sensorPin, HIGH);
+    digitalWrite(valvePin, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
-    Serial.println("Turned On Valve");
+    //Serial.println("Turned On Valve");
+    lcd.setCursor(1, 0);
+    lcd.print("Turned On Valve");
+    delay(2000);
+    lcd.clear();
   }
   if (pascal >= 0.0333){
-    digitalWrite(sensorPin, LOW);
+    digitalWrite(valvePin, LOW);
     digitalWrite(LED_BUILTIN, LOW);
-    Serial.println("Turned Off Valve");
+    //Serial.println("Turned Off Valve");
+    lcd.setCursor(1, 0);
+    lcd.print("Turned Off Valve");
+    delay(2000);
+    lcd.clear();
   }
 }
